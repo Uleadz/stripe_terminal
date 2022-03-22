@@ -65,4 +65,26 @@ dependencies {
     implementation("com.stripe:stripeterminal:$stripeTerminalVersion") { transitive = true }
 
 
+
+
+    // Coroutines
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlin_coroutines_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlin_coroutines_version"
+
+    // OK HTTP
+    implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
+
+    // Retrofit
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+
+    // Stripe Terminal library
+    implementation "com.stripe:stripeterminal:$stripeTerminalVersion"
+
+
+
+    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.9.3"))
+    implementation("com.squareup.okhttp3:logging-interceptor")
+
+
 }
