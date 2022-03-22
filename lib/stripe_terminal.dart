@@ -12,7 +12,8 @@ class StripeTerminal {
     return _discoverReaderStreamController.stream;
   }
 
-  static final StreamController _discoverReaderStreamController = StreamController.broadcast();
+  static final StreamController _discoverReaderStreamController =
+      StreamController.broadcast();
   static const MethodChannel _methodChannel = MethodChannel('stripe_terminal');
 
   static void setup() async {
@@ -41,7 +42,8 @@ class StripeTerminal {
   //   }
   // }
 
-  static Future<void> setupConnectionTokenProvider({required ConnectionTokenProviderConfiguration config}) async {
+  static Future<void> setupConnectionTokenProvider(
+      {required ConnectionTokenProviderConfiguration config}) async {
     await _methodChannel.invokeMethod(
       "setupConnectionTokenProvider",
       {
@@ -54,7 +56,8 @@ class StripeTerminal {
     print('');
   }
 
-  static Future<void> discoverReaders({required BluetoothDiscoveryConfiguration config}) async {
+  static Future<void> discoverReaders(
+      {required BluetoothDiscoveryConfiguration config}) async {
     await _methodChannel.invokeMethod(
       "discoverReaders",
       {
