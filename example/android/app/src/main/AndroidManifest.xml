@@ -2,7 +2,6 @@
     package="com.yahlli.stripe_terminal_example">
    <application
         android:label="stripe_terminal_example"
-        android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
