@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:stripe_terminal/models/configurations/bluetooth_connection_configuration.dart';
 import 'package:stripe_terminal/models/configurations/bluetooth_discovery_configuration.dart';
 import 'package:stripe_terminal/models/configurations/connection_token_provider_configuration.dart';
+import 'package:stripe_terminal/models/configurations/simulate_reader_update.dart';
 import 'package:stripe_terminal/models/stripe_reader.dart';
 import 'package:stripe_terminal/stripe_terminal.dart';
 
@@ -25,11 +26,37 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   StripeReader? connectedReader;
   bool isLoadingReaderConnection = false;
+  String connectionMessage = 'Connecting...';
 
   @override
   void initState() {
     super.initState();
     initPlatformState();
+
+    StripeTerminal.isUpdateRequired.listen((event) {
+      print('Is update required ${event}');
+      if (event) {
+        setState(() {
+          connectionMessage = 'Updating reader';
+        });
+      }
+    });
+
+    StripeTerminal.updateProgress.listen((event) {
+      print('Update progress ${event}');
+      setState(() {
+        connectionMessage = 'Updating reader\nProgress: ${event * 100}%';
+      });
+    });
+
+    StripeTerminal.hasFinishedIntallingUpdate.listen((event) {
+      print('hasFinishedIntallingUpdate: ${event}');
+      if (event) {
+        setState(() {
+          connectionMessage = 'Connecting...';
+        });
+      }
+    });
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -84,7 +111,18 @@ class _MyAppState extends State<MyApp> {
                       stream: StripeTerminal.didUpdateDiscoveredReader,
                       builder: (context, snapshot) {
                         if (isLoadingReaderConnection) {
-                          return const CircularProgressIndicator();
+                          return Column(
+                            children: [
+                              const CircularProgressIndicator(),
+                              const SizedBox(
+                                height: 16,
+                              ),
+                              Text(
+                                connectionMessage,
+                                style: TextStyle(fontWeight: FontWeight.w600),
+                              )
+                            ],
+                          );
                         }
 
                         if (snapshot.hasData) {
@@ -111,7 +149,11 @@ class _MyAppState extends State<MyApp> {
                                     await StripeTerminal.connectBluetoothReader(
                                       reader: currReader,
                                       config: BluetoothConnectionConfiguration(
-                                        locationId: 'tml_EiQJwXfwQkiMuF',
+                                        // locationId: 'tml_EiQJwXfwQkiMuF',
+                                        locationId: 'tml_EibM5gDe0QpBZt',
+                                        simulateReaderUpdate:
+                                            SimulateReaderUpdate
+                                                .UPDATE_AVAILABLE,
                                       ),
                                     );
 
@@ -148,7 +190,13 @@ class _MyAppState extends State<MyApp> {
                     // const paymentIntent = 'YOUR_PAYMENT_INTENT_HERE';
                     const paymentIntent =
                         // 'pi_3KgH7fLBnGF2noZq11fv4gy0_secret_fHhbANK4bJAfYwSJcXBpPBwOR';
-                        'pi_3KgHOALBnGF2noZq1rh8woqi_secret_jxE7iJg8F9lZFziAkHKGxQVXT';
+                        // 'pi_3KgHOALBnGF2noZq1rh8woqi_secret_jxE7iJg8F9lZFziAkHKGxQVXT';
+                        // 'pi_3KgTVnLBnGF2noZq0H6XQZpM_secret_e4P6fiTfBayUSodGhptlPNdyh';
+                        // 'pi_3KgTfN2R2OSHGJzg1bsrCCxh_secret_5tDpnX1VTpA38b2UZzR7bvEAb';
+                        // 'pi_3KgTk92R2OSHGJzg1L8EyoxH_secret_Z2QQ2n316MZuUdYnqmCoEGYoN';
+                        // 'pi_3KgTlW2R2OSHGJzg1cdZUfQk_secret_x9ROZsVpEgDGsIG08UEKf9gZN';
+                        // 'pi_3KgTld2R2OSHGJzg1sq4CAuP_secret_SkdV348oYKL6yb1FLSLNkobBw';
+                        'pi_3KgTlk2R2OSHGJzg0VdKEusy_secret_HM3kIZb3H8nEItEiiu1fGDic4';
 
                     try {
                       await StripeTerminal.charge(paymentIntent: paymentIntent);

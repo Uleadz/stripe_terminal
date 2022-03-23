@@ -98,6 +98,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     connectBluetoothReader(
                         call.argument<String>("selectedReaderSerialNumber")!!,
                         call.argument<String>("locationId")!!,
+                        call.argument<String>("simulateReaderUpdate")!!,
                         result
                     )
 
@@ -135,9 +136,23 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     cancelPaymentIntent(result)
                 }
             }
+            "updateReader" -> {
+                ensureTerminalInitialized(result){
+                    updateReader()
+                }
+            }
             else -> {
                 result.notImplemented()
             }
+        }
+    }
+
+    private fun updateReader() {
+
+        val connectedReader = Terminal.getInstance()
+            .connectedReader
+        connectedReader?.let {
+            it.availableUpdate?.let { it1 -> it.update(it1) }
         }
     }
 
@@ -226,6 +241,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
 
         try {
+            Log.d(Constants.TAG, "Charging payment intent: ${paymentIntent} ");
             val processPaymentCallback by lazy {
                 object : PaymentIntentCallback {
                     override fun onSuccess(paymentIntent: PaymentIntent) {
@@ -268,6 +284,11 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     override fun onSuccess(paymentIntent: PaymentIntent) {
                         Log.d(Constants.TAG, "createPaymentIntent succeeded");
                         this@StripeTerminalPlugin.paymentIntent = paymentIntent
+                        Terminal.getInstance().simulatorConfiguration = SimulatorConfiguration(
+                            simulatedCard = SimulatedCard(
+                                SimulatedCardType.CHARGE_DECLINED_INSUFFICIENT_FUNDS
+                            )
+                        )
                         taskCancelable = Terminal.getInstance()
                             .collectPaymentMethod(paymentIntent, collectPaymentMethodCallback)
                     }
@@ -318,6 +339,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private fun connectBluetoothReader(
         selectedReaderSerialNumber: String,
         locationId: String,
+        simulateReaderUpdate: String,
         result: Result
     ) {
         val selectedReader =
@@ -336,9 +358,16 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             locationId
         )
 
+        val simulateReaderUpdateValue = SimulateReaderUpdate.valueOf(simulateReaderUpdate)
+
+        Terminal.getInstance().simulatorConfiguration = SimulatorConfiguration(
+            update = simulateReaderUpdateValue
+        )
+
         val readerCallback = object : ReaderCallback {
+
             override fun onSuccess(reader: Reader) {
-                print("Successfully connected to reader: ${reader}")
+                Log.d(Constants.TAG, "Successfully connected to reader: ${reader}");
                 result.success(null)
             }
 
@@ -356,6 +385,56 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             connectionConfig,
             object : BluetoothReaderListener {
 
+                override fun onFinishInstallingUpdate(
+                    update: ReaderSoftwareUpdate?,
+                    e: TerminalException?
+                ) {
+                    Log.d(Constants.TAG, "onFinishInstallingUpdate: ${update}")
+                    Handler(Looper.getMainLooper()).post{
+                        channel.invokeMethod(
+                            "onFinishInstallingUpdate",
+                            true
+                        )
+
+                    }
+                    super.onFinishInstallingUpdate(update, e)
+                }
+
+                override fun onReportAvailableUpdate(update: ReaderSoftwareUpdate) {
+                    Log.d(Constants.TAG, "onReportAvailableUpdate: called ");
+                    super.onReportAvailableUpdate(update)
+                }
+
+                override fun onReportReaderSoftwareUpdateProgress(progress: Float) {
+                    Log.d(Constants.TAG, "onReportReaderSoftwareUpdateProgress: ${progress} ")
+                    Handler(Looper.getMainLooper()).post{
+                        channel.invokeMethod(
+                            "updateProgress",
+                            progress
+                        )
+
+                    }
+                    super.onReportReaderSoftwareUpdateProgress(progress)
+                }
+
+                override fun onRequestReaderDisplayMessage(message: ReaderDisplayMessage) {
+                    Log.d(Constants.TAG, "onRequestReaderDisplayMessage: ${message}");
+                    super.onRequestReaderDisplayMessage(message)
+                }
+
+                override fun onStartInstallingUpdate(
+                    update: ReaderSoftwareUpdate,
+                    cancelable: Cancelable?
+                ) {
+                    Log.d(Constants.TAG, "onStartInstallingUpdate called: ");
+                    Handler(Looper.getMainLooper()).post{
+                        channel.invokeMethod(
+                            "isUpdateRequired",
+                            true
+                        )
+                    }
+                    super.onStartInstallingUpdate(update, cancelable)
+                }
             },
             readerCallback
         )
@@ -366,6 +445,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         Log.d(Constants.TAG, "discoverReaders called");
         val discoveryConfig =
             DiscoveryConfiguration(0, DiscoveryMethod.BLUETOOTH_SCAN, simulated)
+
 
         try {
             val discoveryCallback = object : Callback {

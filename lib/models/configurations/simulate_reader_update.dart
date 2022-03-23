@@ -1,0 +1,1 @@
+enum SimulateReaderUpdate { UPDATE_AVAILABLE, NONE, REQUIRED, RANDOM }

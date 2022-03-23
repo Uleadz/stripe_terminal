@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:stripe_terminal/models/configurations/bluetooth_connection_configuration.dart';
 import 'package:stripe_terminal/models/configurations/bluetooth_discovery_configuration.dart';
 import 'package:stripe_terminal/models/configurations/connection_token_provider_configuration.dart';
+import 'package:stripe_terminal/models/configurations/simulate_reader_update.dart';
 import 'package:stripe_terminal/models/stripe_reader.dart';
 
 class StripeTerminal {
@@ -12,8 +13,31 @@ class StripeTerminal {
     return _discoverReaderStreamController.stream;
   }
 
+  static Stream<bool> get isUpdateRequired {
+    return _isUpdateRequiredSteamController.stream;
+  }
+
+  static Stream<double> get updateProgress {
+    return _updateProgressStreamController.stream;
+  }
+
+  static Stream<bool> get hasFinishedIntallingUpdate {
+    return _hasFinishedIntallingUpdateStreamController.stream;
+  }
+
   static final StreamController _discoverReaderStreamController =
       StreamController.broadcast();
+
+  static final StreamController<bool>
+      _hasFinishedIntallingUpdateStreamController =
+      StreamController<bool>.broadcast();
+
+  static final StreamController<bool> _isUpdateRequiredSteamController =
+      StreamController<bool>.broadcast();
+
+  static final StreamController<double> _updateProgressStreamController =
+      StreamController.broadcast();
+
   static const MethodChannel _methodChannel = MethodChannel('stripe_terminal');
 
   static void setup() async {
@@ -61,8 +85,9 @@ class StripeTerminal {
     print('');
   }
 
-  static Future<void> discoverReaders(
-      {required BluetoothDiscoveryConfiguration config}) async {
+  static Future<void> discoverReaders({
+    required BluetoothDiscoveryConfiguration config,
+  }) async {
     await _methodChannel.invokeMethod(
       "discoverReaders",
       {
@@ -75,11 +100,14 @@ class StripeTerminal {
     required StripeReader reader,
     required BluetoothConnectionConfiguration config,
   }) async {
+    print(
+        'config.simulateReaderUpdate.toString(): ${config.simulateReaderUpdate.name}');
     await _methodChannel.invokeMethod(
       "connectBluetoothReader",
       {
         'selectedReaderSerialNumber': reader.serialNumber,
         'locationId': config.locationId,
+        'simulateReaderUpdate': config.simulateReaderUpdate.name,
       },
     );
   }
@@ -124,7 +152,13 @@ class StripeTerminal {
     await _methodChannel.invokeMethod(
       'cancelPaymentIntent',
     );
+    return;
+  }
 
+  static Future<void> updateReader() async {
+    await _methodChannel.invokeMethod(
+      'updateReader',
+    );
     return;
   }
 
@@ -133,6 +167,15 @@ class StripeTerminal {
     switch (methodCall.method) {
       case 'didUpdateDiscoveredReaders':
         _didUpdateDiscoveredReaders(methodCall.arguments);
+        break;
+      case 'isUpdateRequired':
+        updateRequired(methodCall.arguments);
+        break;
+      case 'updateProgress':
+        didProgressUpdate(methodCall.arguments);
+        break;
+      case 'onFinishInstallingUpdate':
+        didFinishInstallingUpdate(methodCall.arguments);
         break;
       default:
         throw PlatformException(
@@ -159,5 +202,25 @@ class StripeTerminal {
     }
     print('StripeReaders Size ${readers.length}');
     _discoverReaderStreamController.add(readers);
+  }
+
+  static void updateRequired(bool arguments) {
+    print('updateRequired arguments $arguments');
+    print('updateRequired arguments type ${arguments.runtimeType}');
+  }
+
+  static void didProgressUpdate(double arguments) {
+    print('didProgressUpdate arguments $arguments');
+    print('didProgressUpdate arguments type ${arguments.runtimeType}');
+
+    _updateProgressStreamController
+        .add(double.parse(arguments.toStringAsFixed(2)));
+  }
+
+  static void didFinishInstallingUpdate(bool arguments) {
+    print('didProgressUpdate arguments $arguments');
+    print('didProgressUpdate arguments type ${arguments.runtimeType}');
+
+    _hasFinishedIntallingUpdateStreamController.add(arguments);
   }
 }
