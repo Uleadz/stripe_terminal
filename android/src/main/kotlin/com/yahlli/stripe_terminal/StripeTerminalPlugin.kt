@@ -40,6 +40,8 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         channel.setMethodCallHandler(this)
         context = flutterPluginBinding.applicationContext
 
+
+
         AndroidNetworking.initialize(context)
         AndroidNetworking.enableLogging(com.androidnetworking.interceptors.HttpLoggingInterceptor.Level.BODY)
         AndroidNetworking.setParserFactory(GsonParserFactory(GsonBuilder().setLenient().create()))

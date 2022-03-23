@@ -9,7 +9,7 @@
 
     <application
         android:usesCleartextTraffic="true"
-        android:name=".StripeTerminalApplication">
+        >
 
     </application>
 
