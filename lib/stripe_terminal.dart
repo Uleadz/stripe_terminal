@@ -50,7 +50,6 @@ class StripeTerminal {
   static Future<void> dispose() async {
     await cancelCurrentTask();
     await disconnectBluetoothReader();
-
     return;
   }
 
@@ -155,12 +154,12 @@ class StripeTerminal {
     return;
   }
 
-  static Future<void> updateReader() async {
-    await _methodChannel.invokeMethod(
-      'updateReader',
-    );
-    return;
-  }
+  // static Future<void> updateReader() async {
+  //   await _methodChannel.invokeMethod(
+  //     'updateReader',
+  //   );
+  //   return;
+  // }
 
   //MARK: - Handler
   static Future<void> methodCallHandler(MethodCall methodCall) async {
@@ -169,13 +168,13 @@ class StripeTerminal {
         _didUpdateDiscoveredReaders(methodCall.arguments);
         break;
       case 'isUpdateRequired':
-        updateRequired(methodCall.arguments);
+        _updateRequired(methodCall.arguments);
         break;
       case 'updateProgress':
-        didProgressUpdate(methodCall.arguments);
+        _didProgressUpdate(methodCall.arguments);
         break;
       case 'onFinishInstallingUpdate':
-        didFinishInstallingUpdate(methodCall.arguments);
+        _didFinishInstallingUpdate(methodCall.arguments);
         break;
       default:
         throw PlatformException(
@@ -204,12 +203,12 @@ class StripeTerminal {
     _discoverReaderStreamController.add(readers);
   }
 
-  static void updateRequired(bool arguments) {
+  static void _updateRequired(bool arguments) {
     print('updateRequired arguments $arguments');
     print('updateRequired arguments type ${arguments.runtimeType}');
   }
 
-  static void didProgressUpdate(double arguments) {
+  static void _didProgressUpdate(double arguments) {
     print('didProgressUpdate arguments $arguments');
     print('didProgressUpdate arguments type ${arguments.runtimeType}');
 
@@ -217,7 +216,7 @@ class StripeTerminal {
         .add(double.parse(arguments.toStringAsFixed(2)));
   }
 
-  static void didFinishInstallingUpdate(bool arguments) {
+  static void _didFinishInstallingUpdate(bool arguments) {
     print('didProgressUpdate arguments $arguments');
     print('didProgressUpdate arguments type ${arguments.runtimeType}');
 
