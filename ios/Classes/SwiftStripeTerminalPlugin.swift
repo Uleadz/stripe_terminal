@@ -221,7 +221,7 @@ public class SwiftStripeTerminalPlugin: NSObject, FlutterPlugin {
         } else if let error = error {
           print("taskCancelable failed: \(error)")
           result(
-            FlutterError(code: "taskCancelable", 
+            FlutterError(code: "taskCancelable",
               message: error.localizedDescription,
               details: "error"
             )

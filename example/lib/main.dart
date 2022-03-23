@@ -11,6 +11,7 @@ import 'package:stripe_terminal/models/stripe_reader.dart';
 import 'package:stripe_terminal/stripe_terminal.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -68,7 +69,7 @@ class _MyAppState extends State<MyApp> {
                   try {
                     await StripeTerminal.discoverReaders(
                       config: BluetoothDiscoveryConfiguration(
-                        simulated: false,
+                        simulated: true,
                       ),
                     );
                   } catch (e) {
@@ -136,14 +137,18 @@ class _MyAppState extends State<MyApp> {
                         }
                       },
                     )
-                  : Text('Connected to reader: ${connectedReader!.serialNumber}'),
+                  : Text(
+                      'Connected to reader: ${connectedReader!.serialNumber}'),
               const SizedBox(height: 50),
               if (connectedReader != null)
                 MaterialButton(
                   child: const Text('Charge 100'),
                   color: Colors.blue,
                   onPressed: () async {
-                    const paymentIntent = 'YOUR_PAYMENT_INTENT_HERE';
+                    // const paymentIntent = 'YOUR_PAYMENT_INTENT_HERE';
+                    const paymentIntent =
+                        // 'pi_3KgH7fLBnGF2noZq11fv4gy0_secret_fHhbANK4bJAfYwSJcXBpPBwOR';
+                        'pi_3KgHOALBnGF2noZq1rh8woqi_secret_jxE7iJg8F9lZFziAkHKGxQVXT';
 
                     try {
                       await StripeTerminal.charge(paymentIntent: paymentIntent);

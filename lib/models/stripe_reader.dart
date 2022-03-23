@@ -10,6 +10,7 @@ class StripeReader {
   });
 
   factory StripeReader.fromJson(json) {
+    print('StripeReader.fromJson');
     return StripeReader(
       serialNumber: json['serialNumber'],
       batteryLevel: json['batteryLevel'],

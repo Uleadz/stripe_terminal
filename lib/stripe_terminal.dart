@@ -44,15 +44,20 @@ class StripeTerminal {
 
   static Future<void> setupConnectionTokenProvider(
       {required ConnectionTokenProviderConfiguration config}) async {
-    await _methodChannel.invokeMethod(
-      "setupConnectionTokenProvider",
-      {
-        'backendBaseUrl': config.backendBaseUrl,
-        'requestUrl': config.requestUrl,
-        'tokenKeyInJson': config.tokenKeyInJson,
-        'userAutherizationToken': config.userAutherizationToken,
-      },
-    );
+    try {
+      // Make sure location permissions are granted otherwise it will throw an exception
+      await _methodChannel.invokeMethod(
+        "setupConnectionTokenProvider",
+        {
+          'backendBaseUrl': config.backendBaseUrl,
+          'requestUrl': config.requestUrl,
+          'tokenKeyInJson': config.tokenKeyInJson,
+          'userAutherizationToken': config.userAutherizationToken,
+        },
+      );
+    } catch (e) {
+      print(e);
+    }
     print('');
   }
 
@@ -138,13 +143,21 @@ class StripeTerminal {
   }
 
   static void _didUpdateDiscoveredReaders(readersListJson) {
+    print('Here inside _didUpdateDiscoveredReaders ${readersListJson}');
     final List<StripeReader> readers = [];
 
     for (var currReaderJson in readersListJson) {
-      final currReader = StripeReader.fromJson(currReaderJson);
+      print('Inside loop $currReaderJson');
+      print('Inside loop ${currReaderJson.runtimeType}');
+      print('serialNumber${currReaderJson["serialNumber"]}');
+
+      var currReader =
+          StripeReader.fromJson(Map<String, dynamic>.from(currReaderJson));
+      print('currReader $currReader');
+
       readers.add(currReader);
     }
-
+    print('StripeReaders Size ${readers.length}');
     _discoverReaderStreamController.add(readers);
   }
 }

@@ -6,6 +6,7 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        jcenter()
     }
 
     dependencies {
@@ -17,6 +18,7 @@ buildscript {
 rootProject.allprojects {
     repositories {
         google()
+        jcenter()
         mavenCentral()
     }
 }
@@ -62,10 +64,8 @@ ext {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
+    // Stripe Terminal library
     implementation("com.stripe:stripeterminal:$stripeTerminalVersion") { transitive = true }
-
-
-
 
     // Coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlin_coroutines_version"
@@ -78,9 +78,7 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
 
-    // Stripe Terminal library
-    implementation "com.stripe:stripeterminal:$stripeTerminalVersion"
-
+    implementation 'com.amitshekhar.android:android-networking:1.0.2'
 
 
     implementation(platform("com.squareup.okhttp3:okhttp-bom:4.9.3"))

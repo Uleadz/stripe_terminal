@@ -1,6 +1,15 @@
 package com.yahlli.stripe_terminal.model
 
-/**
- * A one-field data class used to handle the connection token response from our backend
- */
-data class ConnectionToken(val secret: String)
+
+import com.google.gson.annotations.SerializedName
+
+data class ConnectionToken(
+    @SerializedName("Data")
+    val `data`: String? = "",
+    @SerializedName("Exception")
+    val exception: Any? = Any(),
+    @SerializedName("Message")
+    val message: String? = "",
+    @SerializedName("State")
+    val state: String? = ""
+)
