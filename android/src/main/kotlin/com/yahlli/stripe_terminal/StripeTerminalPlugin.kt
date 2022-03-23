@@ -284,10 +284,10 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     override fun onSuccess(paymentIntent: PaymentIntent) {
                         Log.d(Constants.TAG, "createPaymentIntent succeeded");
                         this@StripeTerminalPlugin.paymentIntent = paymentIntent
-                        Terminal.getInstance().simulatorConfiguration = SimulatorConfiguration(
-                            simulatedCard = SimulatedCard(
-                                SimulatedCardType.CHARGE_DECLINED_INSUFFICIENT_FUNDS
-                            )
+//                        Terminal.getInstance().simulatorConfiguration = SimulatorConfiguration(
+//                            simulatedCard = SimulatedCard(
+//                                SimulatedCardType.CHARGE_DECLINED_INSUFFICIENT_FUNDS
+//                            )
                         )
                         taskCancelable = Terminal.getInstance()
                             .collectPaymentMethod(paymentIntent, collectPaymentMethodCallback)
