@@ -225,67 +225,75 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private fun charge(paymentIntent: String, result: Result) {
 
 
-        val processPaymentCallback by lazy {
-            object : PaymentIntentCallback {
-                override fun onSuccess(paymentIntent: PaymentIntent) {
-                    Log.d(Constants.TAG, "processPayment succeeded");
-                    result.success(paymentIntent.id)
-                }
+        try {
+            val processPaymentCallback by lazy {
+                object : PaymentIntentCallback {
+                    override fun onSuccess(paymentIntent: PaymentIntent) {
+                        Log.d(Constants.TAG, "processPayment succeeded");
+                        result.success(paymentIntent.id)
+                    }
 
-                override fun onFailure(e: TerminalException) {
-                    Log.d(Constants.TAG, "processPaymentCallback failed: ${e.message}");
-                    result.error(
-                        "processPaymentCallbackFailed",
-                        e.localizedMessage,
-                        "error"
-                    )
-                }
-            }
-        }
-
-
-        val collectPaymentMethodCallback by lazy {
-            object : PaymentIntentCallback {
-                override fun onSuccess(paymentIntent: PaymentIntent) {
-                    Log.d(Constants.TAG, "collectPaymentMethod succeeded");
-                    Terminal.getInstance().processPayment(paymentIntent, processPaymentCallback)
-                }
-
-                override fun onFailure(e: TerminalException) {
-                    Log.d(Constants.TAG, "collectPaymentMethodCallback failed: ${e.message}");
-                    result.error(
-                        "collectPaymentMethodCallbackFailed",
-                        e.localizedMessage,
-                        "error"
-                    )
+                    override fun onFailure(e: TerminalException) {
+                        Log.d(Constants.TAG, "processPaymentCallback failed: ${e.message}");
+                        result.error(
+                            "processPaymentCallbackFailed",
+                            e.localizedMessage,
+                            "error"
+                        )
+                    }
                 }
             }
-        }
 
-        val createPaymentIntentCallback by lazy {
-            object : PaymentIntentCallback {
-                override fun onSuccess(paymentIntent: PaymentIntent) {
-                    Log.d(Constants.TAG, "createPaymentIntent succeeded");
-                    this@StripeTerminalPlugin.paymentIntent = paymentIntent
-                    taskCancelable = Terminal.getInstance()
-                        .collectPaymentMethod(paymentIntent, collectPaymentMethodCallback)
-                }
 
-                override fun onFailure(e: TerminalException) {
-                    Log.d(Constants.TAG, "createPaymentIntent failed: ${e.message}");
-                    result.error(
-                        "createPaymentIntentFailed",
-                        e.localizedMessage,
-                        "error"
-                    )
+            val collectPaymentMethodCallback by lazy {
+                object : PaymentIntentCallback {
+                    override fun onSuccess(paymentIntent: PaymentIntent) {
+                        Log.d(Constants.TAG, "collectPaymentMethod succeeded");
+                        Terminal.getInstance().processPayment(paymentIntent, processPaymentCallback)
+                    }
+
+                    override fun onFailure(e: TerminalException) {
+                        Log.d(Constants.TAG, "collectPaymentMethodCallback failed: ${e.message}");
+                        result.error(
+                            "collectPaymentMethodCallbackFailed",
+                            e.localizedMessage,
+                            "error"
+                        )
+                    }
                 }
             }
-        }
 
-        Terminal.getInstance().retrievePaymentIntent(
-            paymentIntent,
-            createPaymentIntentCallback
-        )
+            val createPaymentIntentCallback by lazy {
+                object : PaymentIntentCallback {
+                    override fun onSuccess(paymentIntent: PaymentIntent) {
+                        Log.d(Constants.TAG, "createPaymentIntent succeeded");
+                        this@StripeTerminalPlugin.paymentIntent = paymentIntent
+                        taskCancelable = Terminal.getInstance()
+                            .collectPaymentMethod(paymentIntent, collectPaymentMethodCallback)
+                    }
+
+                    override fun onFailure(e: TerminalException) {
+                        Log.d(Constants.TAG, "createPaymentIntent failed: ${e.message}");
+                        result.error(
+                            "createPaymentIntentFailed",
+                            e.localizedMessage,
+                            "error"
+                        )
+                    }
+                }
+            }
+
+            Terminal.getInstance().retrievePaymentIntent(
+                paymentIntent,
+                createPaymentIntentCallback
+            )
+        } catch (e: Exception) {
+            result.error(
+                "chargeFailed",
+                e.localizedMessage,
+                "error"
+            )
+        }
     }
 
     private fun disconnectedBluetoothReader(result: Result) {
