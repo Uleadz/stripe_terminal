@@ -75,6 +75,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 val tokenKeyInJson = call.argument<String>("tokenKeyInJson")
                 val userAutherizationToken = call.argument<String>("userAutherizationToken")
 
+
                 setupConnectionTokenProvider(
                     backendBaseUrl!!,
                     requestUrl!!,
@@ -84,40 +85,77 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 )
             }
             "discoverReaders" -> {
+                ensureTerminalInitialized(result) {
+                    discoverReaders(
+                        call.argument<Boolean>("simulated")!!,
+                        result
+                    )
 
-                discoverReaders(
-                    call.argument<Boolean>("simulated")!!,
-                    result
-                )
+                }
             }
             "connectBluetoothReader" -> {
-                connectBluetoothReader(
-                    call.argument<String>("selectedReaderSerialNumber")!!,
-                    call.argument<String>("locationId")!!,
-                    result
-                )
+                ensureTerminalInitialized(result) {
+                    connectBluetoothReader(
+                        call.argument<String>("selectedReaderSerialNumber")!!,
+                        call.argument<String>("locationId")!!,
+                        result
+                    )
+
+                }
             }
             "charge" -> {
-                charge(
-                    call.argument<String>("paymentIntent")!!,
-                    result
-                )
+                ensureTerminalInitialized(result) {
+                    charge(
+                        call.argument<String>("paymentIntent")!!,
+                        result
+                    )
+
+                }
             }
             "disconnectBluetoothReader" -> {
-                disconnectedBluetoothReader(result)
+                ensureTerminalInitialized(result) {
+                    disconnectedBluetoothReader(result)
+
+                }
             }
             "cancelCurrentTask" -> {
-                cancelCurrentTask(result)
+                ensureTerminalInitialized(result) {
+                    cancelCurrentTask(result)
+
+                }
             }
             "clearCachedCredentials" -> {
-                clearCachedCredentials(result)
+                ensureTerminalInitialized(result) {
+                    clearCachedCredentials(result)
+
+                }
             }
             "cancelPaymentIntent" -> {
-                cancelPaymentIntent(result)
+                ensureTerminalInitialized(result) {
+                    cancelPaymentIntent(result)
+                }
             }
-
             else -> {
                 result.notImplemented()
+            }
+        }
+    }
+
+    private fun onTerminalNotInitializedError(result: Result) {
+        result.error(
+            "Terminal not initialized",
+            "Please initialize terminal and then try to get it's instance",
+            "error"
+        )
+    }
+
+    private fun ensureTerminalInitialized(result: Result, onSuccess: () -> Unit) {
+        when {
+            Terminal.isInitialized() -> {
+                onSuccess()
+            }
+            else -> {
+                onTerminalNotInitializedError(result)
             }
         }
     }
