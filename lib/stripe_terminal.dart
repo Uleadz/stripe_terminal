@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:stripe_terminal/models/configurations/bluetooth_connection_configuration.dart';
 import 'package:stripe_terminal/models/configurations/bluetooth_discovery_configuration.dart';
 import 'package:stripe_terminal/models/configurations/connection_token_provider_configuration.dart';
-import 'package:stripe_terminal/models/configurations/simulate_reader_update.dart';
 import 'package:stripe_terminal/models/stripe_reader.dart';
 
 class StripeTerminal {
@@ -25,18 +24,13 @@ class StripeTerminal {
     return _hasFinishedIntallingUpdateStreamController.stream;
   }
 
-  static final StreamController _discoverReaderStreamController =
-      StreamController.broadcast();
+  static final StreamController _discoverReaderStreamController = StreamController.broadcast();
 
-  static final StreamController<bool>
-      _hasFinishedIntallingUpdateStreamController =
-      StreamController<bool>.broadcast();
+  static final StreamController<bool> _hasFinishedIntallingUpdateStreamController = StreamController<bool>.broadcast();
 
-  static final StreamController<bool> _isUpdateRequiredSteamController =
-      StreamController<bool>.broadcast();
+  static final StreamController<bool> _isUpdateRequiredSteamController = StreamController<bool>.broadcast();
 
-  static final StreamController<double> _updateProgressStreamController =
-      StreamController.broadcast();
+  static final StreamController<double> _updateProgressStreamController = StreamController.broadcast();
 
   static const MethodChannel _methodChannel = MethodChannel('stripe_terminal');
 
@@ -65,8 +59,7 @@ class StripeTerminal {
   //   }
   // }
 
-  static Future<void> setupConnectionTokenProvider(
-      {required ConnectionTokenProviderConfiguration config}) async {
+  static Future<void> setupConnectionTokenProvider({required ConnectionTokenProviderConfiguration config}) async {
     try {
       // Make sure location permissions are granted otherwise it will throw an exception
       await _methodChannel.invokeMethod(
@@ -99,8 +92,7 @@ class StripeTerminal {
     required StripeReader reader,
     required BluetoothConnectionConfiguration config,
   }) async {
-    print(
-        'config.simulateReaderUpdate.toString(): ${config.simulateReaderUpdate.name}');
+    print('config.simulateReaderUpdate.toString(): ${config.simulateReaderUpdate.name}');
     await _methodChannel.invokeMethod(
       "connectBluetoothReader",
       {
@@ -185,7 +177,7 @@ class StripeTerminal {
   }
 
   static void _didUpdateDiscoveredReaders(readersListJson) {
-    print('Here inside _didUpdateDiscoveredReaders ${readersListJson}');
+    print('Here inside _didUpdateDiscoveredReaders $readersListJson');
     final List<StripeReader> readers = [];
 
     for (var currReaderJson in readersListJson) {
@@ -193,8 +185,7 @@ class StripeTerminal {
       print('Inside loop ${currReaderJson.runtimeType}');
       print('serialNumber${currReaderJson["serialNumber"]}');
 
-      var currReader =
-          StripeReader.fromJson(Map<String, dynamic>.from(currReaderJson));
+      var currReader = StripeReader.fromJson(Map<String, dynamic>.from(currReaderJson));
       print('currReader $currReader');
 
       readers.add(currReader);
@@ -214,8 +205,7 @@ class StripeTerminal {
     print('didProgressUpdate arguments $arguments');
     print('didProgressUpdate arguments type ${arguments.runtimeType}');
 
-    _updateProgressStreamController
-        .add(double.parse(arguments.toStringAsFixed(2)));
+    _updateProgressStreamController.add(double.parse(arguments.toStringAsFixed(2)));
   }
 
   static void _didFinishInstallingUpdate(bool arguments) {

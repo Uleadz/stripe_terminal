@@ -10,6 +10,7 @@ class StripeReader {
   });
 
   factory StripeReader.fromJson(json) {
+    // ignore: avoid_print
     print('StripeReader.fromJson');
     return StripeReader(
       serialNumber: json['serialNumber'],

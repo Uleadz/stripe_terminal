@@ -34,7 +34,7 @@ class _MyAppState extends State<MyApp> {
     initPlatformState();
 
     StripeTerminal.isUpdateRequired.listen((event) {
-      print('Is update required ${event}');
+      print('Is update required $event');
       if (event) {
         setState(() {
           connectionMessage = 'Updating reader';
@@ -43,14 +43,14 @@ class _MyAppState extends State<MyApp> {
     });
 
     StripeTerminal.updateProgress.listen((event) {
-      print('Update progress ${event}');
+      print('Update progress $event');
       setState(() {
         connectionMessage = 'Updating reader\nProgress: ${event * 100}%';
       });
     });
 
     StripeTerminal.hasFinishedIntallingUpdate.listen((event) {
-      print('hasFinishedIntallingUpdate: ${event}');
+      print('hasFinishedIntallingUpdate: $event');
       if (event) {
         setState(() {
           connectionMessage = 'Connecting...';
@@ -119,7 +119,7 @@ class _MyAppState extends State<MyApp> {
                               ),
                               Text(
                                 connectionMessage,
-                                style: TextStyle(fontWeight: FontWeight.w600),
+                                style: const TextStyle(fontWeight: FontWeight.w600),
                               )
                             ],
                           );
@@ -151,8 +151,7 @@ class _MyAppState extends State<MyApp> {
                                       config: BluetoothConnectionConfiguration(
                                         // locationId: 'tml_EiQJwXfwQkiMuF',
                                         locationId: 'tml_EibM5gDe0QpBZt',
-                                        simulateReaderUpdate:
-                                            SimulateReaderUpdate.NONE,
+                                        simulateReaderUpdate: SimulateReaderUpdate.NONE,
                                       ),
                                     );
 
@@ -178,8 +177,7 @@ class _MyAppState extends State<MyApp> {
                         }
                       },
                     )
-                  : Text(
-                      'Connected to reader: ${connectedReader!.serialNumber}'),
+                  : Text('Connected to reader: ${connectedReader!.serialNumber}'),
               const SizedBox(height: 50),
               if (connectedReader != null)
                 MaterialButton(

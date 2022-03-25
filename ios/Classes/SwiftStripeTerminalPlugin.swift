@@ -43,6 +43,7 @@ public class SwiftStripeTerminalPlugin: NSObject, FlutterPlugin {
       self.connectBluetoothReader(
         selectedReaderSerialNumber: args!["selectedReaderSerialNumber"] as! String,
         locationId: args!["locationId"] as! String,
+        simulateReaderUpdate: args!["simulateReaderUpdate"] as! String,
         result: result
       )
     } else if(call.method == "disconnectBluetoothReader") {
@@ -156,7 +157,7 @@ public class SwiftStripeTerminalPlugin: NSObject, FlutterPlugin {
     }
   }
 
-  private func connectBluetoothReader(selectedReaderSerialNumber: String, locationId: String, result: @escaping FlutterResult) {
+  private func connectBluetoothReader(selectedReaderSerialNumber: String, locationId: String, simulateReaderUpdate: String, result: @escaping FlutterResult) {
     let selectedReader = self.availableReaders.filter{ $0.serialNumber == selectedReaderSerialNumber }.first
     
     if selectedReader == nil {
@@ -173,6 +174,21 @@ public class SwiftStripeTerminalPlugin: NSObject, FlutterPlugin {
     let connectionConfig = BluetoothConnectionConfiguration(
       locationId: locationId
     )
+
+    var simulateReaderUpdateValue = SimulateReaderUpdate.none
+    if (simulateReaderUpdate == "UPDATE_AVAILABLE") {
+      simulateReaderUpdateValue = SimulateReaderUpdate.available
+    } else if(simulateReaderUpdate == "NONE") {
+      simulateReaderUpdateValue = SimulateReaderUpdate.none
+    } else if(simulateReaderUpdate == "REQUIRED") {
+      simulateReaderUpdateValue = SimulateReaderUpdate.required
+    } else if(simulateReaderUpdate == "RANDOM") {
+      simulateReaderUpdateValue = SimulateReaderUpdate.random
+    } else {
+      simulateReaderUpdateValue = SimulateReaderUpdate.none
+    }
+
+    Terminal.shared.simulatorConfiguration.availableReaderUpdate = simulateReaderUpdateValue
 
     Terminal.shared.connectBluetoothReader(selectedReader!, delegate: self, connectionConfig: connectionConfig) { reader, error in
             if let reader = reader {
@@ -306,15 +322,20 @@ extension SwiftStripeTerminalPlugin: DiscoveryDelegate {
 
 @available(iOS 11.0, *)
 extension SwiftStripeTerminalPlugin: BluetoothReaderDelegate {
-    public func reader(_ reader: Reader, didReportAvailableUpdate update: ReaderSoftwareUpdate) {}
+    public func reader(_ reader: Reader, didReportAvailableUpdate update: ReaderSoftwareUpdate) {
+      print("did report avaliable update")
+    }
 
-    public func reader(_ reader: Reader, didStartInstallingUpdate update: ReaderSoftwareUpdate, cancelable: Cancelable?) {}
+    public func reader(_ reader: Reader, didStartInstallingUpdate update: ReaderSoftwareUpdate, cancelable: Cancelable?) {
+      channel.invokeMethod("isUpdateRequired", arguments: true)
+    }
 
     public func reader(_ reader: Reader, didFinishInstallingUpdate update: ReaderSoftwareUpdate?, error: Error?) {
-        
+        channel.invokeMethod("onFinishInstallingUpdate", arguments: true)
     }
 
     public func reader(_ reader: Reader, didReportReaderSoftwareUpdateProgress progress: Float) {
+      channel.invokeMethod("updateProgress", arguments: progress)
     }
 
     public func reader(_ reader: Reader, didRequestReaderInput inputOptions: ReaderInputOptions = []) {
