@@ -395,7 +395,6 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                             "onFinishInstallingUpdate",
                             true
                         )
-
                     }
                     super.onFinishInstallingUpdate(update, e)
                 }

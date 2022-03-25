@@ -152,7 +152,7 @@ class _MyAppState extends State<MyApp> {
                                         // locationId: 'tml_EiQJwXfwQkiMuF',
                                         locationId: 'tml_EibM5gDe0QpBZt',
                                         simulateReaderUpdate:
-                                            SimulateReaderUpdate.REQUIRED,
+                                            SimulateReaderUpdate.NONE,
                                       ),
                                     );
 
