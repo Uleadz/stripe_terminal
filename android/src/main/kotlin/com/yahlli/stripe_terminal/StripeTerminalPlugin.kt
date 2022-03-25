@@ -288,7 +288,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 //                            simulatedCard = SimulatedCard(
 //                                SimulatedCardType.CHARGE_DECLINED_INSUFFICIENT_FUNDS
 //                            )
-                        )
+//                        )
                         taskCancelable = Terminal.getInstance()
                             .collectPaymentMethod(paymentIntent, collectPaymentMethodCallback)
                     }

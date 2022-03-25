@@ -206,6 +206,8 @@ class StripeTerminal {
   static void _updateRequired(bool arguments) {
     print('updateRequired arguments $arguments');
     print('updateRequired arguments type ${arguments.runtimeType}');
+
+    _isUpdateRequiredSteamController.add(arguments);
   }
 
   static void _didProgressUpdate(double arguments) {
