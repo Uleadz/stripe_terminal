@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:stripe_terminal/models/configurations/bluetooth_connection_configuration.dart';
 import 'package:stripe_terminal/models/configurations/bluetooth_discovery_configuration.dart';
 import 'package:stripe_terminal/models/configurations/connection_token_provider_configuration.dart';
+import 'package:stripe_terminal/models/configurations/discovery_method.dart';
 import 'package:stripe_terminal/models/stripe_reader.dart';
 
 class StripeTerminal {
@@ -44,6 +45,7 @@ class StripeTerminal {
   static Future<void> dispose() async {
     await cancelCurrentTask();
     await disconnectBluetoothReader();
+    await disconnectLocalMobileReader();
     return;
   }
 
@@ -84,6 +86,7 @@ class StripeTerminal {
       "discoverReaders",
       {
         'simulated': config.simulated,
+        'discoveryMethod': config.discoveryMethod == DiscoveryMethod.BLUETOOTH_SCAN ? 'bluetoothScan' : 'localMobile',
       },
     );
   }
@@ -107,6 +110,33 @@ class StripeTerminal {
     try {
       await _methodChannel.invokeMethod(
         "disconnectBluetoothReader",
+      );
+
+      return;
+    } catch (e) {
+      print('No device is connected so cannot disconnect');
+      print(e);
+    }
+  }
+
+  static Future<void> connectLocalMobileReader({
+    required StripeReader reader,
+    required BluetoothConnectionConfiguration config,
+  }) async {
+    print('config.simulateReaderUpdate.toString(): ${config.simulateReaderUpdate.name}');
+    await _methodChannel.invokeMethod(
+      "connectLocalMobileReader",
+      {
+        'selectedReaderSerialNumber': reader.serialNumber,
+        'locationId': config.locationId,
+      },
+    );
+  }
+
+  static Future<void> disconnectLocalMobileReader() async {
+    try {
+      await _methodChannel.invokeMethod(
+        "disconnectLocalMobileReader",
       );
 
       return;

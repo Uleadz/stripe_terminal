@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:stripe_terminal/models/configurations/bluetooth_connection_configuration.dart';
 import 'package:stripe_terminal/models/configurations/bluetooth_discovery_configuration.dart';
 import 'package:stripe_terminal/models/configurations/connection_token_provider_configuration.dart';
+import 'package:stripe_terminal/models/configurations/discovery_method.dart';
 import 'package:stripe_terminal/models/configurations/simulate_reader_update.dart';
 import 'package:stripe_terminal/models/stripe_reader.dart';
 import 'package:stripe_terminal/stripe_terminal.dart';
@@ -97,6 +98,7 @@ class _MyAppState extends State<MyApp> {
                     await StripeTerminal.discoverReaders(
                       config: BluetoothDiscoveryConfiguration(
                         simulated: true,
+                        discoveryMethod: DiscoveryMethod.LOCAL_MOBILE,
                       ),
                     );
                   } catch (e) {

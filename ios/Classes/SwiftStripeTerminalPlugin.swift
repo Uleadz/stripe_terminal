@@ -37,6 +37,7 @@ public class SwiftStripeTerminalPlugin: NSObject, FlutterPlugin {
     } else if(call.method == "discoverReaders") {
       self.discoverReaders(
         simulated: args!["simulated"] as! Bool,
+        discoveryMethod: (args!["discoveryMethod"] as! String) == "localMobile" ? .localMobile : .bluetoothScan,
         result: result
       )
     } else if(call.method == "connectBluetoothReader") {
@@ -48,6 +49,16 @@ public class SwiftStripeTerminalPlugin: NSObject, FlutterPlugin {
       )
     } else if(call.method == "disconnectBluetoothReader") {
       self.disconnectBluetoothReader(
+        result: result
+      )
+    } else if(call.method == "connectLocalMobileReader") {
+      self.connectLocalMobileReader(
+        selectedReaderSerialNumber: args!["selectedReaderSerialNumber"] as! String,
+        locationId: args!["locationId"] as! String,
+        result: result
+      )
+    } else if(call.method == "disconnectLocalMobileReader") {
+      self.disconnectLocalMobileReader(
         result: result
       )
     } else if(call.method == "charge") {
@@ -89,11 +100,11 @@ public class SwiftStripeTerminalPlugin: NSObject, FlutterPlugin {
     result(nil);
   }
 
-  private func discoverReaders(simulated: Bool, result: @escaping FlutterResult) {
+  private func discoverReaders(simulated: Bool, discoveryMethod: DiscoveryMethod, result: @escaping FlutterResult) {
     print("discoverReaders called")
 
     let config = DiscoveryConfiguration(
-      discoveryMethod: .bluetoothScan,
+      discoveryMethod: discoveryMethod,
       simulated: simulated
     )
 
@@ -208,6 +219,59 @@ public class SwiftStripeTerminalPlugin: NSObject, FlutterPlugin {
   }
 
   private func disconnectBluetoothReader(result: @escaping FlutterResult) {
+    Terminal.shared.disconnectReader({ error in
+            if error == nil {
+                print("Successfully disconnected from reader")
+                result(nil)
+            } else if let error = error {
+                print("disconnectReader failed: \(error)")
+                result(
+                  FlutterError(code: "disconnectBluetoothReaderFailed", 
+                    message: error.localizedDescription,
+                    details: "error"
+                  )
+                );
+            }
+      }
+    )
+  }
+
+  private func connectLocalMobileReader(selectedReaderSerialNumber: String, locationId: String, result: @escaping FlutterResult) {
+    let selectedReader = self.availableReaders.filter{ $0.serialNumber == selectedReaderSerialNumber }.first
+    
+    if selectedReader == nil {
+      print("Unknown reader selected")
+      result(
+        FlutterError(code: "connectLocalMobileReaderFailed", 
+          message: "Unknown reader selected",
+          details: "Unknown reader selected"
+        )
+      );
+      return
+    }
+
+    let connectionConfig = LocalMobileConnectionConfiguration(
+      locationId: locationId
+    )
+
+    Terminal.shared.connectLocalMobileReader(selectedReader!, delegate: self, connectionConfig: connectionConfig) { reader, error in
+            if let reader = reader {
+                print("Successfully connected to mobile reader: \(reader)")
+                result(nil)
+            } else if let error = error {
+                print("connectLocalMobileReader failed: \(error)")
+                result(
+                  FlutterError(code: "connectLocalMobileReaderFailed", 
+                    message: error.localizedDescription,
+                    details: "error"
+                  )
+                );
+            }
+        }
+
+  }
+
+  private func disconnectLocalMobileReader(result: @escaping FlutterResult) {
     Terminal.shared.disconnectReader({ error in
             if error == nil {
                 print("Successfully disconnected from reader")
@@ -344,6 +408,29 @@ extension SwiftStripeTerminalPlugin: BluetoothReaderDelegate {
 
     public func reader(_ reader: Reader, didRequestReaderDisplayMessage displayMessage: ReaderDisplayMessage) {
       print("didRequestReaderDisplayMessage: \(displayMessage)")
+    }
+}
+
+@available(iOS 16.0, *)
+extension SwiftStripeTerminalPlugin: LocalMobileReaderDelegate {
+    public func localMobileReader(_ reader: Reader, didRequestReaderInput inputOptions: ReaderInputOptions = []) {
+        print("didRequestReaderInput: \(inputOptions)")
+    }
+    
+    public func localMobileReader(_ reader: Reader, didRequestReaderDisplayMessage displayMessage: ReaderDisplayMessage) {
+        print("didRequestReaderDisplayMessage: \(displayMessage)")
+    }
+    
+    public func localMobileReader(_ reader: Reader, didStartInstallingUpdate update: ReaderSoftwareUpdate, cancelable: Cancelable?) {
+        channel.invokeMethod("isUpdateRequired", arguments: true)
+    }
+
+    public func localMobileReader(_ reader: Reader, didReportReaderSoftwareUpdateProgress progress: Float) {
+        channel.invokeMethod("updateProgress", arguments: progress)
+    }
+
+    public func localMobileReader(_ reader: Reader, didFinishInstallingUpdate update: ReaderSoftwareUpdate?, error: Error?) {
+        channel.invokeMethod("onFinishInstallingUpdate", arguments: true)
     }
 }
 

@@ -2,8 +2,8 @@ PODS:
   - Flutter (1.0.0)
   - stripe_terminal (0.0.1):
     - Flutter
-    - StripeTerminal (~> 2.6.0)
-  - StripeTerminal (2.6.0)
+    - StripeTerminal (~> 2.14.0)
+  - StripeTerminal (2.14.0)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
@@ -21,9 +21,9 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
-  stripe_terminal: 4074424e74f8fbf13dd8d202603b365561b4000e
-  StripeTerminal: c75c9d5be371a0e292a829f56860fc98ed5a3149
+  stripe_terminal: 1534f41776fb32febc213ada7d056fb79f12b8ed
+  StripeTerminal: 9bb367c9efa7bcddf2602cc29f8962390d87b6a6
 
 PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.11.3
