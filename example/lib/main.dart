@@ -67,11 +67,11 @@ class _MyAppState extends State<MyApp> {
     try {
       StripeTerminal.setupConnectionTokenProvider(
         config: ConnectionTokenProviderConfiguration(
-          backendBaseUrl: 'https://test1-ucallz.azurewebsites.net',
+          backendBaseUrl: 'https://ucallz.ngrok.io',
           requestUrl: '/Api/ConnectionToken',
           tokenKeyInJson: 'Data',
           userAutherizationToken:
-              'ETzLL8flFMUXsHCUGi2xrokKB8iV_Yt0tudK54N6c6WTDsgJWHMVtKAbq2J9oqJ0vyGQzZ6FdN3mnQw8Dhl_i8B5c2szocwCuZngrkfSPrhyKiffr7CE8t_kez6uKAE_zcKcW4BhxRKCjFXPISXiZ5gxIUXtCeqdOhrA9msLhkKni_v5A5Ifhw_rLClbaThBvSRl-DBokAZZGEwxmkY4I1vYTTQ1bz7UpPNWF-GHP_wwR6Ci2fEai96c-DRKBOUpvliF7PBWG15EeAJmou88Z2dOQz7XoUIepk2D3RMzsGz_4dVY_8hrnw_plgMje9DT_etRvn6QS3StV0zDwGcj9xzzqOBXHnpFY4FneWaSGMf12lW9LVq_XHpq9obPOT7x07OZhsq5HUcGO6fpO3_lNiTGzrBlNBog0FUJJ7MZuVobEv-LajJQC6_oBqnitrXNb5ddVJKe4b7ivvCD8gruNDdTGM2K69_CiXzFESnVS3fYr5pcAu6RXOwIvhFUACmKl9jKa_9UXVSDObvjKMew0goR5BfqQr9TZkIS-DQmJA4',
+              'YsrwiRbUjIp5D0oUzn-FlYM0JXabsG-bvk_aVxO1gBLPl0bnDfQdmMv3AIQYX4fk8ncOIoD5iWx0g-W4dYGS8_W1UvcAf3Ek4HEhMouCq7NFKQWKQEeBE8wdo9punNgHsIgU61vc_1kGP1trLEcxMov2e-GSuN5huUp7Deigg-3rusUEN9D7hg_OOljheNuMREW6K5rcJ5AOrcSueWUaMiVZG1mcLLsS3vuf5rN0pY90wDSIYp_foK_fID1u2HUIDpx7_no0wBMBlbWFjZbtBqx3owQvOZTRxcB6768joBbPjze4x3dgf-frhHzEHQmWB3_Fz5yhWFyASFJv8i08KjWa6asrRm2dA0KQw7Sc-uhzCOzipmXXcXLgcnXTTDaCn6TjGtRQhTyG2t3JP1O7YQ9yT0_tLDFaCYh7qY-0pkJI4XdSvAe94tly20F1l0-3BlqeFWCjlPKU_fa630RgKzYczl1I9xhjnAnEr2da89LcDvy38QPGw2zZsAM2cGIP7Xm6avIARSvfM4mEKqgC4gy-0J6F9qs3-p4ELrnM4dI',
         ),
       );
     } on PlatformException catch (e) {
@@ -148,7 +148,7 @@ class _MyAppState extends State<MyApp> {
                                   });
 
                                   try {
-                                    await StripeTerminal.connectBluetoothReader(
+                                    await StripeTerminal.connectLocalMobileReader(
                                       reader: currReader,
                                       config: BluetoothConnectionConfiguration(
                                         // locationId: 'tml_EiQJwXfwQkiMuF',
@@ -156,6 +156,14 @@ class _MyAppState extends State<MyApp> {
                                         simulateReaderUpdate: SimulateReaderUpdate.NONE,
                                       ),
                                     );
+                                    // await StripeTerminal.connectBluetoothReader(
+                                    //   reader: currReader,
+                                    //   config: BluetoothConnectionConfiguration(
+                                    //     // locationId: 'tml_EiQJwXfwQkiMuF',
+                                    //     locationId: 'tml_EibM5gDe0QpBZt',
+                                    //     simulateReaderUpdate: SimulateReaderUpdate.NONE,
+                                    //   ),
+                                    // );
 
                                     setState(() {
                                       connectedReader = currReader;

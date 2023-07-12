@@ -141,6 +141,20 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     updateReader()
                 }
             }
+            "connectLocalMobileReader" -> {
+                ensureTerminalInitialized(result){
+                    connectLocalMobileReader(
+                        call.argument<String>("selectedReaderSerialNumber")!!,
+                        call.argument<String>("locationId")!!,
+                        result
+                    )
+                }
+            }
+            "disconnectLocalMobileReader" -> {
+                ensureTerminalInitialized(result){
+                    disconnectLocalMobileReader(result)
+                }
+            }
             else -> {
                 result.notImplemented()
             }
@@ -336,6 +350,25 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         })
     }
 
+    private fun disconnectLocalMobileReader(result: Result) {
+        Terminal.getInstance().disconnectReader(object : Callback {
+            override fun onFailure(e: TerminalException) {
+                Log.d(Constants.TAG, "disconnectReader failed: ${e.message}");
+                result.error(
+                    "disconnectLocalMobileReaderFailed",
+                    e.localizedMessage,
+                    "error"
+                )
+            }
+
+            override fun onSuccess() {
+                Log.d(Constants.TAG, "Successfully disconnected from reader")
+                result.success(null)
+            }
+
+        })
+    }
+
     private fun connectBluetoothReader(
         selectedReaderSerialNumber: String,
         locationId: String,
@@ -435,6 +468,50 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     super.onStartInstallingUpdate(update, cancelable)
                 }
             },
+            readerCallback
+        )
+    }
+
+    private fun connectLocalMobileReader(
+        selectedReaderSerialNumber: String,
+        locationId: String,
+        result: Result
+    ) {
+        val selectedReader =
+            availableReaders.firstOrNull { it.serialNumber == selectedReaderSerialNumber }
+        if (selectedReader == null) {
+            print("Unknown reader selected")
+            result.error(
+                "connectLocalMobileReaderFailed",
+                "Unknown reader selected",
+                "Unknown reader selected"
+            )
+            return
+        }
+
+        val connectionConfig = ConnectionConfiguration.LocalMobileConnectionConfiguration(
+            locationId
+        )
+
+        val readerCallback = object : ReaderCallback {
+
+            override fun onSuccess(reader: Reader) {
+                Log.d(Constants.TAG, "Successfully connected to reader: ${reader}");
+                result.success(null)
+            }
+
+            override fun onFailure(e: TerminalException) {
+                Log.d(Constants.TAG, "connectReader failed ${selectedReader} with error: ${e.message}");
+                result.error(
+                    "connectLocalMobileReaderFailed",
+                    e.localizedMessage, "error"
+                )
+            }
+        }
+
+        Terminal.getInstance().connectLocalMobileReader(
+            selectedReader,
+            connectionConfig,
             readerCallback
         )
     }
