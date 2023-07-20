@@ -97,7 +97,7 @@ class _MyAppState extends State<MyApp> {
                   try {
                     await StripeTerminal.discoverReaders(
                       config: BluetoothDiscoveryConfiguration(
-                        simulated: true,
+                        simulated: false,
                         discoveryMethod: DiscoveryMethod.LOCAL_MOBILE,
                       ),
                     );
