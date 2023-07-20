@@ -87,6 +87,7 @@ class StripeTerminal {
       {
         'simulated': config.simulated,
         'discoveryMethod': config.discoveryMethod == DiscoveryMethod.BLUETOOTH_SCAN ? 'bluetoothScan' : 'localMobile',
+        "locationId": config.locationId,
       },
     );
   }

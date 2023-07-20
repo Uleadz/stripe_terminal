@@ -89,6 +89,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     discoverReaders(
                         call.argument<String>("discoveryMethod")!!,
                         call.argument<Boolean>("simulated")!!,
+                        call.argument<String>("locationId")!!,
                         result
                     )
 
@@ -517,7 +518,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         )
     }
 
-    private fun discoverReaders(discoveryMethodString: String, simulated: Boolean, result: Result) {
+    private fun discoverReaders(discoveryMethodString: String, simulated: Boolean, locationId: String, result: Result) {
         var discoveryMethod = DiscoveryMethod.LOCAL_MOBILE;
         if(discoveryMethodString == "bluetoothScan") {
             discoveryMethod = DiscoveryMethod.BLUETOOTH_SCAN
@@ -527,7 +528,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
         Log.d(Constants.TAG, "discoverReaders called");
         val discoveryConfig =
-            DiscoveryConfiguration(0, discoveryMethod, simulated)
+            DiscoveryConfiguration(0, discoveryMethod, simulated, locationId)
 
 
         try {

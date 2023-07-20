@@ -99,6 +99,7 @@ class _MyAppState extends State<MyApp> {
                       config: BluetoothDiscoveryConfiguration(
                         simulated: false,
                         discoveryMethod: DiscoveryMethod.LOCAL_MOBILE,
+                        locationId: 'tml_EibM5gDe0QpBZt',
                       ),
                     );
                   } catch (e) {
