@@ -29,6 +29,10 @@ apply plugin: 'kotlin-android'
 android {
     compileSdkVersion 33
 
+    configurations{
+        all*.exclude module: 'bcprov-jdk15on'
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
