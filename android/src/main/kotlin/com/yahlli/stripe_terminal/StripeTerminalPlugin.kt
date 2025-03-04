@@ -40,8 +40,6 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         channel.setMethodCallHandler(this)
         context = flutterPluginBinding.applicationContext
 
-
-
         AndroidNetworking.initialize(context)
         AndroidNetworking.enableLogging(com.androidnetworking.interceptors.HttpLoggingInterceptor.Level.BODY)
         AndroidNetworking.setParserFactory(GsonParserFactory(GsonBuilder().setLenient().create()))
@@ -68,6 +66,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             "getPlatformVersion" -> {
                 result.success("Android ${android.os.Build.VERSION.RELEASE}")
             }
+
             "setupConnectionTokenProvider" -> {
                 Log.d(Constants.TAG, "setupConnectionTokenProvider called: ")
                 val backendBaseUrl = call.argument<String>("backendBaseUrl")
@@ -84,6 +83,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     result
                 )
             }
+
             "discoverReaders" -> {
                 ensureTerminalInitialized(result) {
                     discoverReaders(
@@ -95,6 +95,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
                 }
             }
+
             "connectBluetoothReader" -> {
                 ensureTerminalInitialized(result) {
                     connectBluetoothReader(
@@ -106,6 +107,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
                 }
             }
+
             "charge" -> {
                 ensureTerminalInitialized(result) {
                     charge(
@@ -115,36 +117,42 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
                 }
             }
+
             "disconnectBluetoothReader" -> {
                 ensureTerminalInitialized(result) {
                     disconnectedBluetoothReader(result)
 
                 }
             }
+
             "cancelCurrentTask" -> {
                 ensureTerminalInitialized(result) {
                     cancelCurrentTask(result)
 
                 }
             }
+
             "clearCachedCredentials" -> {
                 ensureTerminalInitialized(result) {
                     clearCachedCredentials(result)
 
                 }
             }
+
             "cancelPaymentIntent" -> {
                 ensureTerminalInitialized(result) {
                     cancelPaymentIntent(result)
                 }
             }
+
             "updateReader" -> {
-                ensureTerminalInitialized(result){
+                ensureTerminalInitialized(result) {
                     updateReader()
                 }
             }
+
             "connectLocalMobileReader" -> {
-                ensureTerminalInitialized(result){
+                ensureTerminalInitialized(result) {
                     connectLocalMobileReader(
                         call.argument<String>("selectedReaderSerialNumber")!!,
                         call.argument<String>("locationId")!!,
@@ -152,11 +160,13 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     )
                 }
             }
+
             "disconnectLocalMobileReader" -> {
-                ensureTerminalInitialized(result){
+                ensureTerminalInitialized(result) {
                     disconnectLocalMobileReader(result)
                 }
             }
+
             else -> {
                 result.notImplemented()
             }
@@ -185,6 +195,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             Terminal.isInitialized() -> {
                 onSuccess()
             }
+
             else -> {
                 onTerminalNotInitializedError(result)
             }
@@ -425,7 +436,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     e: TerminalException?
                 ) {
                     Log.d(Constants.TAG, "onFinishInstallingUpdate: ${update}")
-                    Handler(Looper.getMainLooper()).post{
+                    Handler(Looper.getMainLooper()).post {
                         channel.invokeMethod(
                             "onFinishInstallingUpdate",
                             true
@@ -441,7 +452,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
                 override fun onReportReaderSoftwareUpdateProgress(progress: Float) {
                     Log.d(Constants.TAG, "onReportReaderSoftwareUpdateProgress: ${progress} ")
-                    Handler(Looper.getMainLooper()).post{
+                    Handler(Looper.getMainLooper()).post {
                         channel.invokeMethod(
                             "updateProgress",
                             progress
@@ -461,7 +472,7 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     cancelable: Cancelable?
                 ) {
                     Log.d(Constants.TAG, "onStartInstallingUpdate called: ");
-                    Handler(Looper.getMainLooper()).post{
+                    Handler(Looper.getMainLooper()).post {
                         channel.invokeMethod(
                             "isUpdateRequired",
                             true
@@ -503,7 +514,10 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             }
 
             override fun onFailure(e: TerminalException) {
-                Log.d(Constants.TAG, "connectReader failed ${selectedReader} with error: ${e.message}");
+                Log.d(
+                    Constants.TAG,
+                    "connectReader failed ${selectedReader} with error: ${e.message}"
+                );
                 result.error(
                     "connectLocalMobileReaderFailed",
                     e.localizedMessage, "error"
@@ -518,9 +532,14 @@ class StripeTerminalPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         )
     }
 
-    private fun discoverReaders(discoveryMethodString: String, simulated: Boolean, locationId: String, result: Result) {
+    private fun discoverReaders(
+        discoveryMethodString: String,
+        simulated: Boolean,
+        locationId: String,
+        result: Result
+    ) {
         var discoveryMethod = DiscoveryMethod.LOCAL_MOBILE;
-        if(discoveryMethodString == "bluetoothScan") {
+        if (discoveryMethodString == "bluetoothScan") {
             discoveryMethod = DiscoveryMethod.BLUETOOTH_SCAN
         } else {
             discoveryMethod = DiscoveryMethod.LOCAL_MOBILE
