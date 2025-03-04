@@ -1,16 +1,10 @@
 package com.yahlli.stripe_terminal.network
 
 import android.util.Log
-import com.androidnetworking.AndroidNetworking
-import com.androidnetworking.error.ANError
-import com.androidnetworking.interfaces.ParsedRequestListener
 import com.stripe.stripeterminal.external.callable.ConnectionTokenCallback
 import com.stripe.stripeterminal.external.callable.ConnectionTokenProvider
 import com.stripe.stripeterminal.external.models.ConnectionTokenException
 import com.yahlli.stripe_terminal.Constants
-import com.yahlli.stripe_terminal.model.ConnectionToken
-import com.yahlli.stripe_terminal.network.MyApiClient.backendBaseUrl
-import com.yahlli.stripe_terminal.network.MyApiClient.requestUrl
 
 /**
  * A simple implementation of the [ConnectionTokenProvider] interface. We just request a

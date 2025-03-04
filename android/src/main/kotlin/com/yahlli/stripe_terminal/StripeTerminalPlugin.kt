@@ -12,8 +12,8 @@ import com.stripe.stripeterminal.Terminal
 import com.stripe.stripeterminal.external.callable.*
 import com.stripe.stripeterminal.external.models.*
 import com.stripe.stripeterminal.log.LogLevel
-import com.yahlli.stripe_terminal.network.TokenProvider
 import com.yahlli.stripe_terminal.network.MyApiClient
+import com.yahlli.stripe_terminal.network.TokenProvider
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding

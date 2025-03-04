@@ -1,9 +1,9 @@
 package com.yahlli.stripe_terminal.network
 
 import android.util.Log
-import com.yahlli.stripe_terminal.model.PaymentIntentCreationResponse
 import com.stripe.stripeterminal.external.models.ConnectionTokenException
 import com.yahlli.stripe_terminal.Constants
+import com.yahlli.stripe_terminal.model.PaymentIntentCreationResponse
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Callback

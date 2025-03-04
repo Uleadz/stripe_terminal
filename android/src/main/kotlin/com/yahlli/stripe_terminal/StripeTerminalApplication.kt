@@ -1,7 +1,6 @@
 package com.yahlli.stripe_terminal
 
 import android.app.Application
-import android.os.StrictMode
 import com.stripe.stripeterminal.TerminalApplicationDelegate
 
 class StripeTerminalApplication : Application() {
