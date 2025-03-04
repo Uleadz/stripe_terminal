@@ -6,7 +6,7 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        jcenter()
+        maven { url 'https://jitpack.io' }
     }
 
     dependencies {
@@ -18,7 +18,7 @@ buildscript {
 rootProject.allprojects {
     repositories {
         google()
-        jcenter()
+        maven { url 'https://jitpack.io' }
         mavenCentral()
     }
 }
@@ -80,7 +80,8 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
 
-    implementation 'com.amitshekhar.android:android-networking:1.0.2'
+    implementation 'com.github.amitshekhariitbhu.Fast-Android-Networking:android-networking:1.0.4'
+//    implementation files('libs/android-networking-1.0.4.aar')
 
 
     implementation(platform("com.squareup.okhttp3:okhttp-bom:4.9.3"))
